@@ -1,0 +1,570 @@
+-- 1. Show all tables
+SHOW TABLES;
+
+
+
+-- 2. Describe passengers table
+DESCRIBE passengers;
+
+
+
+-- 3. Describe buses table
+DESCRIBE buses;
+
+
+
+-- 4. Describe routes table
+DESCRIBE routes;
+
+
+
+-- 5. Describe schedules table
+DESCRIBE schedules;
+
+
+
+-- 6. Describe bookings table
+DESCRIBE bookings;
+
+
+
+-- 7. Show all passengers
+SELECT * 
+FROM passengers;
+
+
+
+-- 8. Show all buses
+SELECT * 
+FROM buses;
+
+
+
+-- 9. Show all routes
+SELECT * 
+FROM routes;
+
+
+
+-- 10. Show all schedules
+SELECT * 
+FROM schedules;
+
+
+
+-- 11. Show all bookings
+SELECT * 
+FROM bookings;
+
+
+
+-- 12. Select passenger name and phone
+SELECT 
+    full_name, 
+    phone
+FROM passengers;
+
+
+
+-- 13. Select bus name type and capacity
+SELECT 
+    bus_name, 
+    bus_type, 
+    capacity
+FROM buses;
+
+
+
+-- 14. Male passengers
+SELECT *
+FROM passengers
+WHERE gender = 'Male';
+
+
+
+-- 15. Buses with capacity more than 40
+SELECT 
+    bus_name, 
+    bus_type, 
+    capacity
+FROM buses
+WHERE capacity > 40;
+
+
+
+-- 16. Schedules with fare more than 800
+SELECT 
+    schedule_id, 
+    travel_date, 
+    departure_time, 
+    fare
+FROM schedules
+WHERE fare > 800;
+
+
+
+-- 17. AC buses with capacity 40 or more
+SELECT 
+    bus_name, 
+    bus_type, 
+    capacity
+FROM buses
+WHERE bus_type = 'AC'
+AND capacity >= 40;
+
+
+
+-- 18. Routes related to Dhaka
+SELECT 
+    source_city, 
+    destination_city, 
+    distance_km, 
+    estimated_time
+FROM routes
+WHERE source_city = 'Dhaka'
+OR destination_city = 'Dhaka';
+
+
+
+-- 19. Buses except Non-AC
+SELECT 
+    bus_name, 
+    bus_type, 
+    capacity
+FROM buses
+WHERE bus_type != 'Non-AC';
+
+
+
+-- 20. Fare between 500 and 1000
+SELECT 
+    schedule_id, 
+    travel_date, 
+    departure_time, 
+    fare
+FROM schedules
+WHERE fare BETWEEN 500 AND 1000;
+
+
+
+-- 21. Source city in Dhaka or Rangpur
+SELECT 
+    source_city, 
+    destination_city, 
+    distance_km
+FROM routes
+WHERE source_city IN ('Dhaka', 'Rangpur');
+
+
+
+-- 22. Unique source cities
+SELECT DISTINCT 
+    source_city
+FROM routes;
+
+
+
+-- 23. Passenger name like Hasan
+SELECT 
+    passenger_id, 
+    full_name, 
+    phone, 
+    email
+FROM passengers
+WHERE full_name LIKE '%Hasan%';
+
+
+
+-- 24. Passengers with email
+SELECT 
+    full_name, 
+    phone, 
+    email
+FROM passengers
+WHERE email IS NOT NULL;
+
+
+
+-- 25. Buses ordered by capacity
+SELECT 
+    bus_name, 
+    bus_type, 
+    capacity
+FROM buses
+ORDER BY capacity DESC;
+
+
+
+-- 26. First five passengers
+SELECT 
+    passenger_id, 
+    full_name, 
+    phone
+FROM passengers
+LIMIT 5;
+
+
+
+-- 27. Pagination passengers
+SELECT 
+    passenger_id, 
+    full_name, 
+    phone
+FROM passengers
+ORDER BY passenger_id
+LIMIT 5 OFFSET 5;
+
+
+
+-- 28. Total passengers
+SELECT 
+    COUNT(*) AS total_passengers
+FROM passengers;
+
+
+
+-- 29. Total fare amount
+SELECT 
+    SUM(total_fare) AS total_fare_amount
+FROM bookings;
+
+
+
+-- 30. Average schedule fare
+SELECT 
+    AVG(fare) AS average_fare
+FROM schedules;
+
+
+
+-- 31. Highest fare
+SELECT 
+    MAX(fare) AS highest_fare
+FROM schedules;
+
+
+
+-- 32. Lowest fare
+SELECT 
+    MIN(fare) AS lowest_fare
+FROM schedules;
+
+
+
+-- 33. Bus count by type
+SELECT 
+    bus_type, 
+    COUNT(*) AS total_buses
+FROM buses
+GROUP BY bus_type;
+
+
+
+-- 34. Booking count by status
+SELECT 
+    booking_status, 
+    COUNT(*) AS total_bookings
+FROM bookings
+GROUP BY booking_status;
+
+
+
+
+
+
+
+-- 36. Top routes with average fare more than 600
+SELECT 
+    r.source_city,
+    r.destination_city,
+    AVG(s.fare) AS average_fare
+FROM schedules s
+JOIN routes r ON s.route_id = r.route_id
+GROUP BY r.route_id, r.source_city, r.destination_city
+HAVING AVG(s.fare) > 600
+ORDER BY average_fare DESC
+LIMIT 3;
+
+
+
+-- 37. Inner join booking details
+SELECT 
+    bk.booking_id,
+    p.full_name AS passenger_name,
+    p.phone,
+    b.bus_name,
+    r.source_city,
+    r.destination_city,
+    s.travel_date,
+    bk.seat_number,
+    bk.total_fare,
+    bk.booking_status
+FROM bookings bk
+INNER JOIN passengers p ON bk.passenger_id = p.passenger_id
+INNER JOIN schedules s ON bk.schedule_id = s.schedule_id
+INNER JOIN buses b ON s.bus_id = b.bus_id
+INNER JOIN routes r ON s.route_id = r.route_id;
+
+
+
+-- 38. Left join passengers with booking count
+SELECT 
+    p.passenger_id,
+    p.full_name,
+    p.phone,
+    COUNT(bk.booking_id) AS total_bookings
+FROM passengers p
+LEFT JOIN bookings bk ON p.passenger_id = bk.passenger_id
+GROUP BY p.passenger_id, p.full_name, p.phone;
+
+
+
+-- 39. Right join routes with schedules
+SELECT 
+    s.schedule_id,
+    b.bus_name,
+    r.source_city,
+    r.destination_city,
+    s.travel_date,
+    s.fare
+FROM schedules s
+RIGHT JOIN routes r ON s.route_id = r.route_id
+LEFT JOIN buses b ON s.bus_id = b.bus_id
+ORDER BY r.route_id;
+
+
+
+-- 40. Full outer join using union
+SELECT 
+    p.full_name AS passenger_name,
+    bk.booking_id,
+    bk.seat_number,
+    bk.booking_status
+FROM passengers p
+LEFT JOIN bookings bk ON p.passenger_id = bk.passenger_id
+
+UNION
+
+SELECT 
+    p.full_name AS passenger_name,
+    bk.booking_id,
+    bk.seat_number,
+    bk.booking_status
+FROM passengers p
+RIGHT JOIN bookings bk ON p.passenger_id = bk.passenger_id;
+
+
+
+-- 41. Cartesian product
+SELECT 
+    b.bus_name,
+    r.source_city,
+    r.destination_city
+FROM buses b
+CROSS JOIN routes r
+LIMIT 20;
+
+
+
+-- 42. Schedules above average fare
+SELECT 
+    schedule_id, 
+    travel_date, 
+    departure_time, 
+    fare
+FROM schedules
+WHERE fare > (
+    SELECT AVG(fare)
+    FROM schedules
+);
+
+
+
+-- 43. Passengers who have bookings
+SELECT 
+    full_name, 
+    phone
+FROM passengers
+WHERE passenger_id IN (
+    SELECT passenger_id
+    FROM bookings
+);
+
+
+
+-- 44. Fare above route average
+SELECT 
+    s.schedule_id, 
+    s.route_id, 
+    s.travel_date, 
+    s.fare
+FROM schedules s
+WHERE s.fare > (
+    SELECT AVG(s2.fare)
+    FROM schedules s2
+    WHERE s2.route_id = s.route_id
+);
+
+
+
+-- 45. Search buses Dhaka to Rangpur
+SELECT 
+    s.schedule_id,
+    b.bus_name,
+    b.bus_type,
+    r.source_city,
+    r.destination_city,
+    s.travel_date,
+    s.departure_time,
+    s.arrival_time,
+    s.fare,
+    s.boarding_point,
+    s.dropping_point
+FROM schedules s
+JOIN buses b ON s.bus_id = b.bus_id
+JOIN routes r ON s.route_id = r.route_id
+WHERE r.source_city = 'Dhaka'
+AND r.destination_city = 'Rangpur'
+AND s.travel_date = '2026-05-20';
+
+
+
+-- 46. Seat availability
+SELECT 
+    s.schedule_id,
+    b.bus_name,
+    b.capacity,
+    COUNT(bk.booking_id) AS booked_seats,
+    b.capacity - COUNT(bk.booking_id) AS available_seats
+FROM schedules s
+JOIN buses b ON s.bus_id = b.bus_id
+LEFT JOIN bookings bk 
+    ON s.schedule_id = bk.schedule_id
+    AND bk.booking_status = 'Booked'
+GROUP BY s.schedule_id, b.bus_name, b.capacity;
+
+
+
+--47. Booked seats for schedule 1
+SELECT 
+    bk.booking_id,
+    p.full_name AS passenger_name,
+    bk.seat_number,
+    bk.booking_status
+FROM bookings bk
+JOIN passengers p ON bk.passenger_id = p.passenger_id
+WHERE bk.schedule_id = 1
+AND bk.booking_status = 'Booked';
+
+
+
+--48. Search booking by phone
+SELECT 
+    bk.booking_id,
+    p.full_name AS passenger_name,
+    p.phone,
+    b.bus_name,
+    r.source_city,
+    r.destination_city,
+    s.travel_date,
+    s.departure_time,
+    bk.seat_number,
+    bk.total_fare,
+    bk.booking_status
+FROM bookings bk
+JOIN passengers p ON bk.passenger_id = p.passenger_id
+JOIN schedules s ON bk.schedule_id = s.schedule_id
+JOIN buses b ON s.bus_id = b.bus_id
+JOIN routes r ON s.route_id = r.route_id
+WHERE p.phone = '01712345678';
+
+
+
+49. Fare category using case
+SELECT 
+    bk.booking_id,
+    p.full_name,
+    bk.total_fare,
+    CASE
+        WHEN bk.total_fare > 1000 THEN 'High Fare'
+        WHEN bk.total_fare BETWEEN 500 AND 1000 THEN 'Medium Fare'
+        ELSE 'Low Fare'
+    END AS fare_category
+FROM bookings bk
+JOIN passengers p ON bk.passenger_id = p.passenger_id
+ORDER BY bk.total_fare DESC;
+
+
+ 50. Fare ranking
+SELECT 
+    s.schedule_id,
+    b.bus_name,
+    r.source_city,
+    r.destination_city,
+    s.fare,
+    DENSE_RANK() OVER (ORDER BY s.fare DESC) AS fare_rank
+FROM schedules s
+JOIN buses b ON s.bus_id = b.bus_id
+JOIN routes r ON s.route_id = r.route_id;
+
+
+
+51. Schedules between dates
+SELECT 
+    s.schedule_id,
+    b.bus_name,
+    r.source_city,
+    r.destination_city,
+    s.travel_date,
+    s.departure_time,
+    s.fare
+FROM schedules s
+JOIN buses b ON s.bus_id = b.bus_id
+JOIN routes r ON s.route_id = r.route_id
+WHERE s.travel_date BETWEEN '2026-05-20' AND '2026-05-22'
+ORDER BY s.travel_date, s.departure_time;
+
+
+
+
+ 55. Admin dashboard summary
+SELECT 
+    (SELECT COUNT(*) FROM passengers) AS total_passengers,
+    (SELECT COUNT(*) FROM buses) AS total_buses,
+    (SELECT COUNT(*) FROM routes) AS total_routes,
+    (SELECT COUNT(*) FROM schedules) AS total_schedules,
+    (SELECT COUNT(*) FROM bookings WHERE booking_status = 'Booked') AS booked_tickets,
+    (SELECT COUNT(*) FROM bookings WHERE booking_status = 'Cancelled') AS cancelled_tickets;
+
+
+56. Total revenue
+SELECT 
+    SUM(total_fare) AS total_revenue
+FROM bookings
+WHERE booking_status = 'Booked'
+AND payment_status = 'Paid';
+
+
+
+57. Route wise total schedules
+SELECT 
+    r.source_city,
+    r.destination_city,
+    COUNT(s.schedule_id) AS total_schedules
+FROM routes r
+LEFT JOIN schedules s ON r.route_id = s.route_id
+GROUP BY r.route_id, r.source_city, r.destination_city
+ORDER BY total_schedules DESC;
+
+
+
+58. Bus wise total bookings
+SELECT 
+    b.bus_name,
+    b.bus_type,
+    COUNT(bk.booking_id) AS total_bookings
+FROM buses b
+JOIN schedules s ON b.bus_id = s.bus_id
+LEFT JOIN bookings bk ON s.schedule_id = bk.schedule_id
+GROUP BY b.bus_id, b.bus_name, b.bus_type
+ORDER BY total_bookings DESC;
